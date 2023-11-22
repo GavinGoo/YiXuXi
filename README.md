@@ -1,5 +1,5 @@
 <div align="center">
-<img src="./assets/img/header.jpg" style="zoom:25%;" />
+<img src="./assets/img/header.jpg" style="width:80px;height:80px;" />
 
 <h1 align="center">译吁嚱</h1>
 
