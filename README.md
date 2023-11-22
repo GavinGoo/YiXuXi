@@ -35,7 +35,7 @@
 
 ## Phone
 
-<img src="C:\Users\Gavin\Translate Site Project\README\mobie_light-1700599275969-16.png" alt="mobie" style="zoom: 50%;" /><img src="./screenshot/mobie_dark.png" alt="mobie" style="zoom: 50%;" />
+<img src="./screenshot/mobie_light.png" alt="mobie" style="zoom: 50%;" /><img src="./screenshot/mobie_dark.png" alt="mobie" style="zoom: 50%;" />
 
 > width < 1100px
 
