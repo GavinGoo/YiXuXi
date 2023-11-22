@@ -43,24 +43,22 @@ $(".send-btn").click(function () {
     $('.deepl').empty();
     $('.gpt').empty();
 
-    // 加载动画
-    $('.send-btn').attr('aria-busy', 'true');
-    $('.deepl').attr('aria-busy', 'true');
-    $('.gpt').attr('aria-busy', 'true');
-
     // 获取输入内容
     var text = $("#content").val();
-    var source_language = $(".source").val();
-    var target_language = $(".target").val();
-    console.log('源语言：' + source_language);
-    console.log('目标语言：' + target_language);
+    
     if (text == "") {
         alert("请输入内容！");
         return;
     }else{
-        // 创建一个Deferred对象
-        var deeplDeferred = $.Deferred();
-        var gptDeferred = $.Deferred();
+        var source_language = $(".source").val();
+        var target_language = $(".target").val();
+        console.log('源语言：' + source_language);
+        console.log('目标语言：' + target_language);
+        
+         // 加载动画
+        $('.send-btn').attr('aria-busy', 'true');
+        $('.deepl').attr('aria-busy', 'true');
+        $('.gpt').attr('aria-busy', 'true');
 
         // let deeplx_content = $('.deepl');
 
