@@ -78,7 +78,8 @@ $(".send-btn").click(function () {
                     $('.send-btn').attr('aria-busy', 'false');
                     $('.deepl').attr('aria-busy', 'false');
                     let response = e.currentTarget.response;
-                    console.log('收到deepl译文：'+response.slice(0, 30));
+                    // console.log('收到deepl译文：'+response.slice(0, 30));
+                    // console.log('收到deepl译文：'+response);
                     // console.log(response);
                     if (response.startsWith("url_redirect:")){
                         window.location.href=response.split(":")[1];
@@ -86,17 +87,25 @@ $(".send-btn").click(function () {
                         var deepl_translation = '';
 
                         // 检测是否为多个结果 如是则重新拼接
-                        var matchArray = response.match(/\[.*?\]/);
-                        if (matchArray){
+                        // var matchArray = response.match(/\[.*?\]/);
+                        var matchArray = /\[.*?\]/;
+                        if (matchArray.test(response)){
                             // console.log('检测到多个结果');
                             // console.log('response_type => ' + typeof(response));
-                            response = response.replace(/'/g, '"')
+
+                            // response = response.replace(/'/g, '"');  // 旧匹配方法 影响性能
+                            var regex_single = /^\['.*'\]$/;
+                            if (regex_single.test(response)) {
+                                // console.log('deepl多个结果以<单引号>包括译文');
+                                response = response.replace(/'/g, '"');
+                            }
+
                             var str2array = JSON.parse(response);
                             // console.log('str2array => ' + str2array);
                             // console.log('str2array_type => ' + typeof(str2array));
                             str2array.forEach(item => {
                                 // console.log(item);
-                                deepl_translation = deepl_translation + item + ' ; ';
+                                deepl_translation = deepl_translation + item + '<br>';
                             });
                         } else {
                             deepl_response = response.replace(/\n/g, '<br>');
@@ -139,7 +148,7 @@ $(".send-btn").click(function () {
                     $('.send-btn').attr('aria-busy', 'false');
                     $('.gpt').attr('aria-busy', 'false');
                     let response = e.currentTarget.response;
-                    console.log('收到gpt译文：'+response.slice(0, 30));
+                    // console.log('收到gpt译文：'+response.slice(0, 30));
                     // console.log(response);
                     if (response.startsWith("url_redirect:")){
                         window.location.href=response.split(":")[1];
@@ -244,11 +253,7 @@ function paste() {
 
     navigator.clipboard.readText().then((text) => {
         // console.log('从剪贴板中粘贴的文本内容：' + text);
-        const pasteText = document.querySelector('#content');
-        pasteText.innerHTML='';
-        // 保险操作
-        $('#content').empty();
-        pasteText.innerHTML = text;
+        $('#content').val(text);
 
         // 自动延申文本框高度
         // pasteText.style.height = "auto";

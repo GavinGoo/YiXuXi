@@ -6,16 +6,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="renderer" content="webkit">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="shortcut icon" href="assets/img/header.jpg" type="image/x-icon"/>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/header.jpg', v=static_version) }}" type="image/x-icon"/>
     <title>译吁唏</title>
     <link rel="stylesheet" href="assets/css/pico.min.css">
-    <link rel="stylesheet" href="assets/css/self.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/szgotop.css') }}">
-    <link href="{{ url_for('static', filename='css/szgotop.css') }}">
-    <!-- <link rel="stylesheet" href="assets/css/szgotop.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/self.css', v=static_version) }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/szgotop.css', v=static_version) }}">
+    <link href="{{ url_for('static', filename='css/szgotop.css', v=static_version) }}">
 
     <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/szgotop.js"></script>
+    <link href="{{ url_for('static', filename='js/szgotop.js', v=static_version) }}">
     <script src="assets/js/clipboard.min.js"></script>
 </head>
 
@@ -173,7 +172,7 @@
             </div>
         </div>
     </footer>
-    <script src="assets/js/self.js"></script>
+    <script src="{{ url_for('static', filename='js/self.js', v=static_version) }}"></script>
 </body>
 
 </html>

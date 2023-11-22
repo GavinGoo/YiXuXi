@@ -11,6 +11,8 @@ import json
 import logging
 
 app = Flask(__name__, static_folder='assets', template_folder='templates')
+app.config['STATIC_VERSION'] = 'v1'
+
 app.config['LOG_FILE'] = './py.log'  
 app.config['LOG_LEVEL'] = logging.INFO
 
@@ -266,6 +268,10 @@ def translate_gpt(content, source_language_code, target_language_code):
     return generate
 
 
+
+@app.context_processor
+def inject_static_version():
+    return {'static_version': app.config['STATIC_VERSION']}
 
 
 @app.route('/')
