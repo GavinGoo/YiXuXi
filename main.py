@@ -124,7 +124,7 @@ def log(msg):
         result = result_step1.rsplit(')', 1)[0]
         addr = json.loads(result).get("addr")
     
-    # 当请求内容长度大于30时截取
+    # 当请求内容长度大于50时截取
     if len(msg) >50 :
         msg = msg[:50] + "..."
 
@@ -135,14 +135,6 @@ def log(msg):
     content = date + " |   " + ip + " |   " + addr + " |   " + msg
 
     with open(file='YiXuXi.log', mode='a', encoding="utf-8") as f:
-        # original_stdout = sys.stdout
-        # try:
-        #     sys.stdout = f
-        #     print(content)
-        # finally:
-        #     sys.stdout.flush()
-        #     sys.stdout = original_stdout
-
         print(content, file=f)
 
 def translate_deeplx(content, source_language_code, target_language_code):
@@ -166,7 +158,7 @@ def translate_deeplx(content, source_language_code, target_language_code):
             'Authorization' : 'DeepL-Auth-Key ' + deeplApi
         }
          
-    print('处理翻译请求：'+content)
+    # print('处理翻译请求：'+content)
     # response = requests.request("POST", url, headers=header, json=data, stream=True)
 
     if source_language_code == "Classical Chinese":
@@ -177,15 +169,25 @@ def translate_deeplx(content, source_language_code, target_language_code):
     # print('deepl响应：'+response.text)
 
     res = json.loads(response.text)
-    text = str(res['alternatives'])
+    text = res['alternatives']
 
-    # print('text：'+text)
-    if text == "[]": 
+    print("deepl响应：", end="")
+    print(res)
+    if text == []: 
+        print("deepl仅返回了一种译文")
         if res['data']: 
-            text = res['data']
+            text = str(res['data'])
         else:
-            text = res
-    return text
+            text = str(res)
+        return text
+    else:
+        print("deepl返回了多种译文")
+        text_box = ''
+        for item in text:
+            # print("deepl译文之一：" + str(item))
+            text_box = text_box + str(item) + '<br>'
+        return text_box
+    
 
 def translate_gpt(content, source_language_code, target_language_code):
     """
@@ -210,7 +212,7 @@ def translate_gpt(content, source_language_code, target_language_code):
         "messages": [{ "role": "user", "content": msg + content}],
         "stream": True
     }
-    print("开始流式请求")
+    # print("开始流式请求")
     
     # 请求接收流式数据 动态print
     try:
@@ -226,6 +228,7 @@ def translate_gpt(content, source_language_code, target_language_code):
             text = json.dumps(text)
             return text
         else:
+            print('gpt响应：', end="")
             def generate():
                 stream_content = str()
                 i = 0
@@ -243,7 +246,6 @@ def translate_gpt(content, source_language_code, target_language_code):
                                     delta = choice['delta']
                                     if 'content' in delta:
                                         delta_content = delta['content']
-                                        # print('gpt响应：' + delta_content)
                                         i += 1
                                         if i < 40:
                                             print(delta_content, end="")
@@ -252,7 +254,7 @@ def translate_gpt(content, source_language_code, target_language_code):
                                             if match_error:
                                                 return "ERROR!"
                                             else:
-                                                print("......")
+                                                print("...")
                                         stream_content = stream_content + delta_content
                                         yield delta_content
     
@@ -284,9 +286,12 @@ def deepl_translate_request():
     send_message = request.values.get("send_message").strip()
     source_language_code = request.values.get("source_language").strip()
     target_language_code = request.values.get("target_language").strip()
-    print('收到翻译请求：'+send_message)
-    print('源语言'+source_language_code)
-    print('目标语言：'+target_language_code)
+    if (len(send_message) > 50):
+        print('收到翻译请求：' + send_message[:50] + "...")
+    else:
+        print('收到翻译请求：' + send_message)
+    print('源语言：' + source_language_code)
+    print('目标语言：' + target_language_code)
     deepl_response = translate_deeplx(send_message, source_language_code, target_language_code)
     # gpt_response = translate_gpt(send_message)
     return deepl_response
