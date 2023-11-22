@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="assets/img/header.jpg" type="image/x-icon"/>
+    <title>译吁唏</title>
+    <link rel="stylesheet" href="assets/css/pico.min.css">
+    <link rel="stylesheet" href="assets/css/self.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/szgotop.css') }}">
+    <link href="{{ url_for('static', filename='css/szgotop.css') }}">
+    <!-- <link rel="stylesheet" href="assets/css/szgotop.css"> -->
+
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/szgotop.js"></script>
+    <script src="assets/js/clipboard.min.js"></script>
+</head>
+
+<body>
+    <!-- <div class="back-to-top cd-top faa-float animated cd-is-visible" style="top: -999px;"></div> -->
+    <header class="container">
+        <div class="header">
+            <div class="header">
+                <img src="assets/img/header.jpg">
+                <h1>译吁嚱</h1>
+            </div>
+            <!-- 夜间模式 -->
+            <script src="assets/js/commons.min.js"></script>
+        </div>
+        <hr>
+    </header>
+    <main class="container">
+        <div class="main">
+            <div class="option">
+                <div class="selector">
+                    <select class="source">
+                        <option value="auto">自动识别</option>
+                        <option value="EN">英语</option>
+                        <option value="ZH">中文</option>
+                        <option value="Classical Chinese">文言文</option>
+                        <option value="JA">日语</option>
+                        <option value="KO">韩语</option>
+                        <option value="FR">法语</option>
+                        <option value="DE">德语</option>
+                        <option value="ES">西班牙语</option>
+                        <option value="RU">俄语</option>
+                        <option value="PT">葡萄牙语</option>
+                        <option value="PT-BR">葡萄牙语(巴西)</option>
+                        <option value="PT-PT">葡萄牙语(除巴西外)</option>
+                        <option value="IT">意大利语</option>
+                        <option value="HU">匈牙利语</option>
+                        <option value="PL">波兰语</option>
+                        <option value="NL">荷兰语</option>
+                        <option value="CS">捷克语</option>
+                        <option value="SK">斯洛伐克语</option>
+                        <option value="SL">斯洛文尼亚语</option>
+                        <option value="RO">罗马尼亚语</option>
+                        <option value="BG">保加利亚语</option>
+                        <option value="DA">丹麦语</option>
+                        <option value="ET">爱沙尼亚语</option>
+                        <option value="FI">芬兰语</option>
+                        <option value="EL">希腊语</option>
+                        <option value="LT">立陶宛语</option>
+                        <option value="LV">拉脱维亚语</option>
+                        <option value="NB">挪威语</option>
+                        <option value="SV">瑞典语</option>
+                        <option value="TR">土耳其语</option>
+                        <option value="UK">乌克兰语</option>
+                        <option value="ID">印尼语</option>
+                    </select>
+                    <button class="switch_lang">
+                        <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_489_191224)">
+                                <path d="M5 7h14m0 0l-3.5 4M19 7l-3.5-4M19 17H5m0 0l3.5 4M5 17l3.5-4" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_489_191224">
+                                    <path fill="currentColor" d="M0 0H24V24H0z">
+
+                                    </path>
+                                </clipPath>
+                            </defs>
+                        </svg>
+
+                    </button>
+                    <select class="target">
+                        <option value="ZH">中文</option>
+                        <option value="EN">英语</option>
+                        <option value="JA">日语</option>
+                        <option value="KO">韩语</option>
+                        <option value="FR">法语</option>
+                        <option value="DE">德语</option>
+                        <option value="ES">西班牙语</option>
+                        <option value="RU">俄语</option>
+                        <option value="PT">葡萄牙语</option>
+                        <option value="PT-BR">葡萄牙语(巴西)</option>
+                        <option value="PT-PT">葡萄牙语(除巴西外)</option>
+                        <option value="IT">意大利语</option>
+                        <option value="HU">匈牙利语</option>
+                        <option value="PL">波兰语</option>
+                        <option value="NL">荷兰语</option>
+                        <option value="CS">捷克语</option>
+                        <option value="SK">斯洛伐克语</option>
+                        <option value="SL">斯洛文尼亚语</option>
+                        <option value="RO">罗马尼亚语</option>
+                        <option value="BG">保加利亚语</option>
+                        <option value="DA">丹麦语</option>
+                        <option value="ET">爱沙尼亚语</option>
+                        <option value="FI">芬兰语</option>
+                        <option value="EL">希腊语</option>
+                        <option value="LT">立陶宛语</option>
+                        <option value="LV">拉脱维亚语</option>
+                        <option value="NB">挪威语</option>
+                        <option value="SV">瑞典语</option>
+                        <option value="TR">土耳其语</option>
+                        <option value="UK">乌克兰语</option>
+                        <option value="ID">印尼语</option>
+                    </select>
+                </div>
+                <button id="send-btn" class="send-btn">译</button>
+            </div>
+            <div class="translationBox">
+                <div class="column">
+                    <div class="codeTitle">
+                        <span>原文</span>
+                        <button id="copy-btn" onclick="paste()">粘贴</button>
+                    </div>
+                    <textarea id="content" name="content"></textarea>
+                </div>
+                <div class="column">
+                    <div class="codeTitle">
+                        <span>Deepl</span>
+                        <button id="copy-btn" onclick="copy()">复制</button>
+                    </div>
+                    <article id="article" class="deepl"></article>
+                </div>
+
+                <div class="column">
+                    <div class="codeTitle">
+                        <span>GPT</span>
+                        <button id="copy-btn" onclick="copy()">复制</button>
+                    </div>
+                    <article id="article" class="gpt"></article>
+                </div>
+                <div class="back-to-top cd-top faa-float animated cd-is-visible" style="top: -999px;"></div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <hr>
+        <div class="footer">
+            <div>
+                Powered by
+                <a href="https://www.deepl.com/" target="_blank">Deepl</a>
+                and
+                <a href="https://openai.com/" target="_blank">OpenAI.</a>
+            </div>
+            <div>
+                <a class="github" href="https://github.com/GavinGoo/YiXuXi" target="_blank">
+                    <svg style="width: 22px;height: 22px;margin-bottom: 5px;">
+                        <path
+                            d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z">
+                        </path>
+                    </svg>
+                    <p>Star on GitHub :)</p>
+                </a>
+            </div>
+        </div>
+    </footer>
+    <script src="assets/js/self.js"></script>
+</body>
+
+</html>

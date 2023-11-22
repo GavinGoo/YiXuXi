@@ -1,0 +1,651 @@
+/* 
+
+写的什么垃圾样式 T T
+
+ */
+
+
+/* :root {
+    --primary: #00acc1;
+} */
+
+/* @media only screen and (prefers-color-scheme:dark) {
+	textarea::-webkit-scrollbar-track {
+
+    }
+} */
+
+/* 让textarea滚动条样式与浏览器滚动条样式相同 */
+/* textarea {
+    scrollbar-width: 5px;
+    scrollbar-color: #00acc1 !important;
+    overflow: auto !important;
+} */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+/* 滚动条导轨 */
+::-webkit-scrollbar-track {
+    background-color: #ffffff00 !important;
+}
+::-moz-scrollbar-track {
+    background-color: #ffffff00 !important;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar-thumb {
+    background-color: #999 !important;
+    border-radius: 8px;
+    padding-top: 10px;
+    padding-bottom: 3px;
+}
+::-moz-scrollbar-thumb {
+    background-color: #999 !important;
+    border-radius: 8px;
+    padding-top: 10px;
+    padding-bottom: 3px;
+}
+
+/* 滚动条按钮 */
+/* textarea::-webkit-scrollbar-button {
+    background-color: #999 !important;
+}
+textarea::-moz-scrollbar-button {
+    background-color: #999 !important;
+} */
+
+/* resize按钮 */
+/* textarea::-webkit-resizer {
+    background-color: #00acc1 !important;
+}
+textarea::-moz-resizer {
+    background-color: #00acc1 !important;
+} */
+
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+header {
+    padding-bottom: 0px;
+}
+
+svg, p {
+    display: inline-block;
+    /* text-align: center; */
+}
+
+button {
+    margin-bottom: 0px;
+}
+
+a:hover {
+    cursor: pointer;
+}
+
+.container{
+    padding: 0px;
+}
+
+/* 头部 */
+header.container {
+    padding-top: 2%;
+    text-align: center;
+    
+}
+
+.header {
+    display: flex;
+    /* height: auto; */
+    /* 将子元素平均分布在容器内 */
+    /* justify-content: space-between;  */
+    align-items: center;
+    padding-bottom: 10px;
+    text-align: center;
+    /* 控制水平方向居中对齐 */
+    /* justify-content: center;  */
+    /* 控制垂直方向居中对齐 */
+    /* align-items: center;  */
+    justify-content: space-between;
+}
+
+body > header > div > div > img {
+    height: 57px;
+    width: 57px;
+    margin-right: 12px;
+}
+
+body > header > div > div > h1 {
+    margin: 0px;
+    margin-right: 12px;
+}
+
+/* body > header > a > h1 {
+    flex: 1;
+} */
+
+/* body > header > div > button {
+    justify-content: flex-end;
+} */
+
+.github {
+    all: initial;
+    color: var(--a-color);
+    width: auto;
+    height: 32px;
+    /* transform: "translateY(4)"; */
+    /* display: inline-block; */
+    margin-top: 20px;
+}
+
+hr {
+    padding-top: 10px;
+    padding-bottom: 0.25rem;
+}
+
+main {
+    all:initial !important;
+    margin: 0px !important;
+    width: 100% !important;
+    display: flex;
+    /* flex: 1 !important; */
+    padding-bottom: 0px;
+    /* 居中 */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-width: 100vh;
+    width: 100%; /* Set the width to 100% */
+    box-sizing: border-box;
+    /* 清空预设后恢复主题色 */
+    color: var(--a-color) !important;
+    min-height: 100vh;
+    flex-direction: column;
+    flex: 1;
+}
+
+
+/* 主要内容 */
+/* main.container {
+    padding-top: 0%;
+    padding-left: 10%;
+    padding-right: 10%;
+} */
+
+.main {
+    flex: 1;
+    margin-bottom: auto;
+}
+
+
+
+body > main > input {
+    /* padding: 0; */
+    height: 100px;
+}
+
+
+/* 分割线 */
+body > main > hr {
+    margin: 10%;
+}
+
+
+/* 输入框 - 自动伸长 */
+ /* #content {
+    overflow: hidden; 
+    resize: none;
+    max-height: none !important;
+    font-size: 16px;
+    padding: 15px;
+} */
+
+/* 输入框 */
+#content {
+    font-size: 16px;
+    height: 150px;
+    /* width: initial; */
+    max-width: none !important;
+    resize: vertical !important;
+    margin-bottom: 0px;
+    overflow: auto !important;
+}
+
+textarea, article {
+    border-top-left-radius: 0px !important;
+    border-top-right-radius: 0px !important;
+} 
+
+/* 默认隐藏pc时的按钮 */
+/* .option_pc {
+    display: none;
+} */
+
+/* option相关 */
+.option {
+    display: flex;
+    /* text-align: center; */
+    /* 让子元素的高度与父元素一致 */
+    align-items: stretch;
+    /* margin: 40%; */
+    margin-top: 5px;
+    margin-bottom: 5px;
+    justify-content:center;
+    /* margin-bottom: 50px; */
+   
+}
+.option .selector {
+    /* margin-right: 12px; */
+    /* text-align: center; */
+    display: flex;
+    width: 200px;
+    /* overflow: auto; */
+    text-align: center;
+}
+/* .option .selector div p {
+    text-align: left;
+    margin: 0px;
+    font-size: 12px;
+    display: none;
+} */
+.option select {
+    padding: initial !important;
+    -webkit-appearance: none;
+    height: 30px;
+    max-width: 80px;
+    padding-left: 5px !important;
+    font-size: 12px;
+    margin: 0px;
+    text-align: left;
+    background-position: center right .15rem !important;
+}
+
+.option select option {
+    /* max-width: 5px !important; */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.option #send-btn{
+    padding: initial;
+    height: 30px;
+    text-align: center;
+    width: 100px;
+}
+.switch_lang {
+    all: initial;
+    color: var(--a-color) !important;
+}
+.switch_lang:hover {
+    cursor: pointer;
+}
+
+
+/* 译文区域 */
+.translationBox{
+    /* text-align: center; */
+    /* display: initial; */
+    justify-content: center;
+    /* align-items: center; */
+}
+
+
+
+/* 译文 */
+article {
+    overflow: auto !important;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    padding: 15px;
+    font-size: 16px;
+    height: 150px;
+    /* width: 500px; */
+    resize: vertical !important;
+}
+
+#article > p {
+    font-size: 16px;
+}
+
+
+/* 译文工具栏 & 复制按钮 */
+.codeTitle{
+    margin-top: 8px;
+    overflow: auto;
+    height: 30px;
+    border: 0;
+    /* background-color: #282c34; */
+    background-color: #1095c1;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 4px 4px 0 0;
+    /* color: #CCCCCC; */
+    color: var(--primary-inverse); /* 使用主题色 */
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    box-sizing: border-box;
+    /* justify-content: space-around; */
+}
+.codeTitle span{
+    padding-top: 5px;
+    font-size: small;
+
+}
+#copy-btn{
+    all: initial;
+    /*width: 15%;*/
+    text-align: right;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    border: 0;
+    align-self: flex-end;
+    /* background-color: #282c34; */
+    /* background-color: #00acc1; */
+    /* color: #CCCCCC; */
+    color: var(--primary-inverse);
+    font-size: small;
+    cursor: pointer;
+}
+#copy-btn :active{
+    all: initial;
+    /* background-color: #282c34; */
+    /* border-color: none; */
+}
+#copy-btn :hover{
+    all: initial;
+    /* background-color: #282c34; */
+    /* border-color: none; */
+}
+
+
+/* ============ 分割线 ============ */
+/* 夜间模式切换按钮 */
+/* button.contrast.switcher.theme-switcher{
+    ::after ;
+} */
+#themes button.theme-switcher:first-of-type {
+    --font-weight: bold
+}
+
+#themes button.theme-switcher i {
+    font-style: normal
+}
+.switcher {
+    /* position: fixed; */
+    position: initial;
+    right: calc(var(--spacing)/ 2 + var(--scrollbar-width,0px));
+    bottom: var(--spacing);
+    width: auto;
+    height: auto;
+    margin-bottom: 0;
+    padding: .75rem;
+    border-radius: 2rem;
+    box-shadow: var(--card-box-shadow);
+    line-height: 1;
+    text-align: right
+}
+
+.switcher::after {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: .15rem solid currentColor;
+    border-radius: 50%;
+    background: linear-gradient(to right,currentColor 0,currentColor 50%,transparent 50%);
+    content: "";
+    vertical-align: bottom;
+    transition: transform var(--transition)
+}
+
+.switcher i {
+    display: inline-block;
+    max-width: 0;
+    padding: 0;
+    overflow: hidden;
+    font-style: normal;
+    font-size: .875rem;
+    white-space: nowrap
+}
+
+.switcher:focus,.switcher:hover {
+    max-width: 100%;
+    transition: background-color var(--transition),border-color var(--transition),color var(--transition),box-shadow var(--transition)
+}
+
+/* 图标旋转动画 */
+.switcher:hover::after {
+    transform: rotate(180deg)
+}
+
+/* hover向左弹出文字 */
+/* .switcher:hover i {
+    max-width: 100%;
+    padding: 0 calc(var(--spacing)/ 2) 0 calc(var(--spacing)/ 4);
+    transition: max-width var(--transition),padding var(--transition)
+} */
+
+.switcher:focus {
+    box-shadow: var(--card-box-shadow),0 0 0 .2rem var(--secondary-focus)
+}
+
+@media (min-width: 576px) {
+    .switcher {
+        right:calc(var(--spacing) + var(--scrollbar-width,0px))
+    }
+}
+/* ============ 分割线 ============ */
+
+
+/* 页脚 */
+footer {
+    /* padding-bottom: 3%; */
+    margin-top: auto;
+    padding: 0% !important;
+    /* margin-top: 100px !important; */
+    /* margin-top: 8rem; */
+    /* display: inline; */
+}
+
+/* body > footer > div {
+    padding-left: 10%;
+    padding-right: 10%;
+    padding-bottom: 0px;
+    text-align: center;
+    margin-right: auto;
+    margin-left: auto;
+    
+} */
+
+/* body > footer > div > div {
+    height: 27px;
+} */
+
+.footer {
+    /* display: initial; */
+    /* align-items: center; */
+    /* padding-bottom: 10px; */
+    text-align: center;
+
+    /* 控制水平方向居中对齐 */
+    /* justify-content: center;  */
+    /* 控制垂直方向居中对齐 */
+    /* align-items: center;  */
+
+    /* display: flex; */
+    justify-content: space-between;
+
+    /* 取消文字居中 */
+    /* text-align: unset; */
+}
+
+/* body > footer > div > div:nth-child(1) {
+    margin-bottom: 5px;
+} */
+
+
+@media (min-width: 1100px) {
+    main {
+        display: flex;
+        flex: 1;
+    }
+    .main {
+        /* max-width: 1400px; */
+        max-width: 100%;
+        /* margin-left: 30px;
+        margin-right: 30px; */
+        box-sizing: border-box;
+        /* display: flex; */
+        flex: 1;
+        margin-bottom: auto;
+        align-items: center;
+        justify-content: center;
+        /* display: flex; */
+        flex-direction: column;
+    }
+
+    /* body > main > div.translationBox > div:nth-child(1) {
+        width: 500px;
+    } */
+
+    /* 默认按钮隐藏 pc按钮显示 */
+    /* .option {
+        display: none;
+    }
+    .option_pc {
+        display: initial;
+    } */
+
+    #content {
+        /* width: 500px; */
+        /* width: 100%; */
+        /* height: 500px; */
+        height: 30vh;
+        
+    }
+
+    article {
+        margin-top: 0px;
+        padding: 15px;
+        font-size: 16px;
+        /* height: 500px; */
+        /* height: 50%; */
+        width: 100%;
+        overflow: auto;
+        resize: vertical;
+        height: 30vh;
+    }
+
+    .translationBox{
+        max-width: 100%;
+        /* 横向排列 */
+        display: flex;
+        box-sizing: border-box;
+        justify-content: space-between;
+        /* align-items: center; */
+        margin-left: 8vh;
+        margin-right: 8vh;
+        /* 会导致悬浮在footer上 */
+        /* height: 20vh; */
+        flex: 1;
+    }
+    /* 三个column均分 */
+    .column {
+        flex: 1;
+    }
+    /* .translationBox .column:nth-child(1) {
+        padding-right: 3%;
+    } */
+    .translationBox .column:nth-child(2) {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    /* .translationBox .column:nth-child(3) {
+        padding-left: 3%;
+    } */
+
+    /* option相关 */
+    .option {
+        /* align-items: center;
+        padding: 20px;
+        padding-top: 0px;
+        padding-bottom: 10px;
+        text-align: center;
+        justify-content: space-between; */
+    
+        /* display: flex; */
+        text-align: center;
+        /* 让子元素的高度与父元素一致 */
+        align-items: stretch;
+        /* margin-right: 10rem;
+        margin-left: 10rem; */
+        /* margin-left: 12px;
+        margin-right: 12px; */
+        text-align: center;
+        flex: 1;
+        min-width: 100%;
+    }
+    .selector {
+        margin-right: 12px;
+        /* text-align: center; */
+        display: flex;
+        /* overflow: auto; */
+        text-align: center;
+    }
+    .selector div p {
+        text-align: left;
+        /* height: 58px; */
+        margin: 0px;
+        font-size: 12px;
+        /* display: inline-block; */
+    }
+    select {
+        padding: initial;
+        -webkit-appearance: none;
+        /* height: 30px; */
+        width: 7rem;
+        padding-left: 5px;
+        font-size: 12px;
+        margin: 0px;
+        text-align: left;
+    }
+
+    /* .column {
+        width: 40vh;
+    } */
+
+    
+}
+
+
+@media (max-width: 1200px) {
+    /* .option {
+        display: initial;
+    } */
+
+    /* .option_pc {
+        display: none;
+    }
+
+    #content {
+        font-size: 16px;
+        height: 500px;
+        width: 100%;
+        max-width: none !important;
+        resize:vertical;
+    }
+
+    article {
+        width: 100%;
+    } */
+
+
+}
