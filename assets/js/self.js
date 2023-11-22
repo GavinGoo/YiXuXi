@@ -82,33 +82,8 @@ $(".send-btn").click(function () {
                     if (response.startsWith("url_redirect:")){
                         window.location.href=response.split(":")[1];
                     } else {
-                        var deepl_translation = '';
-
-                        // 检测是否为多个结果 如是则重新拼接
-                        // var matchArray = response.match(/\[.*?\]/);
-                        var matchArray = /\[.*?\]/;
-                        if (matchArray.test(response)){
-                            // console.log('检测到多个结果');
-                            // console.log('response_type => ' + typeof(response));
-
-                            // response = response.replace(/'/g, '"');  // 旧匹配方法 影响性能
-                            var regex_single = /^\['.*'\]$/;
-                            if (regex_single.test(response)) {
-                                // console.log('deepl多个结果以<单引号>包括译文');
-                                response = response.replace(/'/g, '"');
-                            }
-
-                            var str2array = JSON.parse(response);
-                            // console.log('str2array => ' + str2array);
-                            // console.log('str2array_type => ' + typeof(str2array));
-                            str2array.forEach(item => {
-                                // console.log(item);
-                                deepl_translation = deepl_translation + item + '<br>';
-                            });
-                        } else {
-                            deepl_response = response.replace(/\n/g, '<br>');
-                            deepl_translation = $('<p>').html(deepl_response);
-                        }
+                        deepl_response = response.replace(/\n/g, '<br>');
+                        deepl_translation = $('<p>').html(deepl_response);
 
                         $('.deepl').empty();
                         $('.deepl').append(deepl_translation);
