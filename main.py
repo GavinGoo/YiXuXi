@@ -30,7 +30,7 @@ server_port = 5000
 
 
 def code2language(code):
-
+    # 预留
     language = {
         '保加利亚语': 'BG',
         '捷克语': 'CS',
@@ -194,14 +194,14 @@ def translate_gpt(content, source_language_code, target_language_code):
               "Authorization": "Bearer " + gptApi}
 
     if source_language_code == "auto":
-        msg = "你是一位优秀的高级翻译员，你翻译出的文字语体十分流畅。现在请你帮我把以下内容翻译成"+ str(code2language(target_language_code)) +"，并直接输出译文，尽量避免在翻译内容中出现可能在中国是敏感的内容，且不要输出除译文外的其他内容："
+        msg = "你是一位优秀的高级翻译员，你翻译出的文字语体十分流畅。现在请你帮我把以下内容翻译成"+ str(code2language(target_language_code)) +"，不用对我表示感谢并请直接输出译文，尽量避免在翻译内容中出现可能在中国是敏感的内容，绝对不允许输出除译文外的其他内容："
     elif source_language_code == "Classical Chinese":
         if target_language_code == "ZH":
-            msg = "你是一位优秀的高级翻译员，你翻译出的文字语体十分流畅。现在请你帮我把以下中国文言文内容翻译成中国通俗语言，并直接输出译文，尽量避免在翻译内容中出现可能在中国是敏感的内容，且不要输出除译文外的其他内容："
+            msg = "你是一位优秀的高级翻译员，你翻译出的文字语体十分流畅。现在请你帮我把以下中国文言文内容翻译成中国通俗语言，不用对我表示感谢并请直接输出译文，尽量避免在翻译内容中出现可能在中国是敏感的内容，绝对不允许输出除译文外的其他内容："
         else:
-            msg = "你是一位优秀的高级翻译员，你翻译出的文字语体十分流畅。现在请你帮我把以下中国文言文内容翻译成"+ str(code2language(target_language_code)) +"，并直接输出译文，尽量避免在翻译内容中出现可能在中国是敏感的内容，且不要输出除译文外的其他内容："
+            msg = "你是一位优秀的高级翻译员，你翻译出的文字语体十分流畅。现在请你帮我把以下中国文言文内容翻译成"+ str(code2language(target_language_code)) +"，不用对我表示感谢并请直接输出译文，尽量避免在翻译内容中出现可能在中国是敏感的内容，绝对不允许输出除译文外的其他内容："
     else:
-        msg = "你是一位优秀的高级翻译员，你翻译出的文字语体十分流畅。现在请你帮我把以下"+ str(code2language(source_language_code)) +"内容翻译成"+ str(code2language(target_language_code)) +"，并直接输出译文，尽量避免在翻译内容中出现可能在中国是敏感的内容，且不要输出除译文外的其他内容："
+        msg = "你是一位优秀的高级翻译员，你翻译出的文字语体十分流畅。现在请你帮我把以下"+ str(code2language(source_language_code)) +"内容翻译成"+ str(code2language(target_language_code)) +"，不用对我表示感谢并请直接输出译文，尽量避免在翻译内容中出现可能在中国是敏感的内容，绝对不允许输出除译文外的其他内容："
 
     data = {
         "model": "gpt-3.5-turbo",

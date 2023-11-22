@@ -1,5 +1,5 @@
 <div align="center">
-<img src="./assets/img/header.jpg" style="zoom:25%;" />
+<img src="./assets/img/header.jpg" style="width:80px;height:80px;" />
 
 <h1 align="center">译吁嚱</h1>
 
@@ -35,7 +35,7 @@
 
 ## Phone
 
-<img src="C:\Users\Gavin\Translate Site Project\README\mobie_light-1700599275969-16.png" alt="mobie" style="zoom: 50%;" /><img src="./screenshot/mobie_dark.png" alt="mobie" style="zoom: 50%;" />
+<img src="./screenshot/mobie_light.png" alt="mobie" style="zoom: 50%;" /><img src="./screenshot/mobie_dark.png" alt="mobie" style="zoom: 50%;" />
 
 > width < 1100px
 
