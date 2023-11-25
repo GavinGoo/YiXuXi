@@ -57,18 +57,33 @@
 
 
 ## 运行
+1. 下载本项目到本地
+   ```bash
+   $ git clone https://github.com/GavinGoo/YiXuXi.git
+   ```
 
-1. 终端下进入本项目根目录。如：`cd ./YiXuXi`
+2. 终端下进入本项目根目录
+   ```bash
+   $ cd YiXuXi
+   ```
 
-2. 执行`pip install -r requirements.txt`安装依赖
+3. 安装依赖
+   ```bash
+   pip install -r requirements.txt
+   # （可选）使用venv
+   # python -m venv venv
+   # ./venv/Scripts/activate # windows
+   # source ./venv/bin/activate # linux
+   ```
 
-3. 在文件`main.py`开头的`预设`部分中填写你的`gptApi` & `deeplApi`
-
-4. 执行`python ./main.py`即可运行程序
+4. 运行
+   ```bash
+   python main.py --gpt-token <your-gpt-token> --deepl-api <your-deepl-api>
+   # 端口默认5000，可通过 --port <port> 更改
+   # 更多选项请使用 --help 查看
+   ```
 
 5. 浏览器访问`http://127.0.0.1:5000`即可享用:)
-
-   > 默认端口5000，可在`main.py`开头的`预设`部分中找到`server_port`更改
    >
    > 另：后台运行：`nohup python ./main.py &`，终端日志会输出到项目根目录下的`nohup.out`
    >
