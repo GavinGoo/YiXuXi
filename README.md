@@ -36,8 +36,8 @@
 ## Phone
 
 <div style="display: flex;">
-<img src="./screenshot/mobie_light.png" alt="mobie" style="zoom: 50%;width:500px;" />
-<img src="./screenshot/mobie_dark.png" alt="mobie" style="zoom: 50%;width:500px;" />
+<img src="./screenshot/mobie_light.png" alt="mobie" style="zoom: 50%;width:400px;" />
+<img src="./screenshot/mobie_dark.png" alt="mobie" style="zoom: 50%;width:400px;" />
 </div>
 
 > width < 1100px
