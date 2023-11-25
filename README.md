@@ -70,24 +70,32 @@
 3. 安装依赖
    ```bash
    pip install -r requirements.txt
-   # （可选）使用venv
-   # python -m venv venv
-   # ./venv/Scripts/activate # windows
-   # source ./venv/bin/activate # linux
    ```
-
-4. 运行
+   
+   >
+   > 或使用venv：
+   >
+   > Python: `python -m venv venv`
+   >
+   > Windows: `./venv/Scripts/activate`
+   >
+   > Linux: `source ./venv/bin/activate`
+   
+5. 运行
    ```bash
    python main.py --gpt-token <your-gpt-token> --deepl-api <your-deepl-api>
-   # 端口默认5000，可通过 --port <port> 更改
-   # 更多选项请使用 --help 查看
    ```
-
-5. 浏览器访问`http://127.0.0.1:5000`即可享用:)
+   
    >
-   > 另：后台运行：`nohup python ./main.py &`，终端日志会输出到项目根目录下的`nohup.out`
+   > 端口默认5000，可通过 `--port <port>` 更改
    >
-   > ​		关闭后台：`ps aux | grep python`，第二列的数字即进程PID，`kill -9 <PID>`
+   > 更多选项请使用 `--help` 查看
+   
+6. 浏览器访问`http://127.0.0.1:5000`即可享用:)
+   >
+   > 另：后台运行：`nohup python ./main.py --gpt-token <your-gpt-token> --deepl-api <your-deepl-api> &`，终端日志会输出到项目根目录下的`nohup.out`
+   >
+   >    关闭后台：`ps aux | grep python`，第二列的数字即进程PID，`kill -9 <PID>`
 
 > 还有很多待完善的地方，在此表示抱歉
 
@@ -108,4 +116,5 @@
 - [DeepLX](https://github.com/OwO-Network/DeepLX)项目`OwO-Network`大佬，项目灵感的起源
 - `zhile`大佬[wozulong](https://github.com/wozulong)，fakeopen接口
 - [ChatGPT-Web](https://github.com/LiangYang666/ChatGPT-Web)项目，流式输出的实现
+- [injet-zhou](https://github.com/injet-zhou)的PR
 - 切图仔群友们
