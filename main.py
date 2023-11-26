@@ -190,24 +190,30 @@ def translate_deeplx(content, source_language_code, target_language_code):
     # print('deepl响应：'+response.text)
 
     res = json.loads(response.text)
-    text = res["alternatives"]
-
     print("deepl响应：", end="")
     print(res)
-    if text == []:
-        print("deepl仅返回了一种译文")
-        if res["data"]:
-            text = str(res["data"])
+
+    # 错误兜底
+    if res['code'] == 200 :
+        text = res["alternatives"]
+        if text == []:
+            print("deepl仅返回了一种译文")
+            if res["data"]:
+                text = str(res["data"])
+            else:
+                text = str(res)
+            return text
         else:
-            text = str(res)
-        return text
+            print("deepl返回了多种译文")
+            text_box = ""
+            for item in text:
+                # print("deepl译文之一：" + str(item))
+                text_box = text_box + str(item) + "<br>"
+            return text_box
+    elif res['message'] == "too many requests":
+        return "<!DOCTYPE html><html><body><p>出错了:( <br> 你请求的翻译内容长度超出了Deepl官方1500tokens的限制 </p></body></html>"
     else:
-        print("deepl返回了多种译文")
-        text_box = ""
-        for item in text:
-            # print("deepl译文之一：" + str(item))
-            text_box = text_box + str(item) + "<br>"
-        return text_box
+        return "<!DOCTYPE html><html><body><p>出错了:( <br> 错误消息：" + str(res['message']) +" </p></body></html>"
 
 
 def translate_gpt(content, source_language_code, target_language_code):
