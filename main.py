@@ -17,6 +17,7 @@ app.config["STATIC_VERSION"] = "v1"
 app.config["LOG_FILE"] = "./py.log"
 app.config["LOG_LEVEL"] = logging.INFO
 
+self.session = requests.Session()
 
 """""
 url & api 预设
@@ -131,7 +132,7 @@ def log(msg):
 
     # 获取IP位置
     url = "https://whois.pconline.com.cn/ipJson.jsp?ip=" + str(ip)
-    res = requests.get(url).text
+    res = self.session.get(url).text
     if res:
         result_step1 = res.split("(", 2)[-1]
         result = result_step1.rsplit(")", 1)[0]
@@ -173,12 +174,12 @@ def translate_deeplx(content, source_language_code, target_language_code):
         }
 
     # print('处理翻译请求：'+content)
-    # response = requests.request("POST", url, headers=header, json=data, stream=True)
+    # response = self.session.request("POST", url, headers=header, json=data, stream=True)
 
     if source_language_code == "Classical Chinese":
         return "（Deepl无法翻译文言文）"
 
-    response = requests.request(
+    response = self.session.request(
         "POST",
         deeplUrl,
         headers=headers,
@@ -254,9 +255,9 @@ def translate_gpt(content, source_language_code, target_language_code):
     }
     # print("开始流式请求")
 
-    # 请求接收流式数据 动态print
+    # 请求接收流式数据
     try:
-        response = requests.request(
+        response = self.session.request(
             "POST",
             gptUrl,
             headers=header,
