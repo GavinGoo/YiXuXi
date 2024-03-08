@@ -22,11 +22,11 @@ self.session = requests.Session()
 """""
 url & api 预设
 """ ""
-gptUrl = "https://api.openai.com/v1/chat/completions"
-gptToken = ""
+gptUrl = args.gpt_url or "https://api.openai.com/v1/chat/completions"
+gptToken = args.gpt_token or ""
 
-deeplUrl = "https://api-free.deepl.com/v2/translate"
-deeplApi = ""
+deeplUrl = args.deepl_url or "https://api-free.deepl.com/v2/translate"
+deeplApi = args.deepl_api or ""
 
 def init(arguments):
     global gptToken, deeplApi
