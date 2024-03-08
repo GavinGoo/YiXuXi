@@ -37,5 +37,5 @@ def parse_args():
         help="DeepL API endpoint",
     )
 
-    args = parser.parse_args()
+    args, _ = parser.parse_known_args()
     return args
