@@ -372,5 +372,4 @@ def gpt_translate_request():
 
 if __name__ == "__main__":
     args = parse_args()
-    init(args)
     app.run(host=args.host, port=args.port, debug=args.debug)
