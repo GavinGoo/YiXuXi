@@ -1,5 +1,6 @@
 # coding:utf-8
 import os
+from os import getenv
 import requests
 import json
 from flask import Flask, render_template, request
@@ -8,8 +9,7 @@ from datetime import datetime
 import logging
 import traceback
 from cmd_args import parse_args
-
-args = None
+import requests
 
 app = Flask(__name__, static_folder="assets", template_folder="templates")
 app.config["STATIC_VERSION"] = "v1"
@@ -17,32 +17,42 @@ app.config["STATIC_VERSION"] = "v1"
 app.config["LOG_FILE"] = "./py.log"
 app.config["LOG_LEVEL"] = logging.INFO
 
-self.session = requests.Session()
 
 """""
 url & api 预设
 """ ""
-gptUrl = args.gpt_url or "https://api.openai.com/v1/chat/completions"
-gptToken = args.gpt_token or ""
+def init(args):
+    global gptUrl, gptToken, deeplUrl, deeplApi, session, req_kwargs
+    
+    gptUrl = "https://api.openai.com/v1/chat/completions"
+    gptToken = ""
 
-deeplUrl = args.deepl_url or "https://api-free.deepl.com/v2/translate"
-deeplApi = args.deepl_api or ""
+    deeplUrl = "https://api-free.deepl.com/v2/translate"
+    deeplApi = ""
 
-def init(arguments):
-    global gptToken, deeplApi
-    if not arguments:
-        return
-    if arguments.gpt_token:
-        gptToken = arguments.gpt_token
-    if arguments.deepl_api:
-        deeplApi = arguments.deepl_api
-    gptToken_env = os.getenv("GPT_TOKEN", "")
-    if gptToken_env:
-        gptToken = gptToken_env
-    deeplApi_env = os.getenv("DEEPL_API", "")
-    if deeplApi_env:
-        deeplApi = deeplApi_env
+    session = requests.Session()
 
+    req_kwargs = {
+            'proxies': {
+                'http': args.proxy,
+                'https': args.proxy,
+            } if args.proxy else None,
+            'timeout': 100,
+            'allow_redirects': False,
+        }
+
+    if args:
+        if args.gpt_url:
+            gptUrl = getenv("YIXUXI_GPT_URL", args.gpt_url)
+
+        if args.deepl_url:
+            deeplUrl =  getenv("YIXUXI_DEEPL_URL", args.deepl_url)
+
+        if args.gpt_token:
+            gptToken =  getenv("YIXUXI_GPT_TOKEN", args.gpt_token)
+
+        if args.deepl_api:
+            deeplApi =  getenv("YIXUXI_DEEPL_API", args.deepl_api)
 
 def code2language(code):
     # 预留
@@ -132,7 +142,7 @@ def log(msg):
 
     # 获取IP位置
     url = "https://whois.pconline.com.cn/ipJson.jsp?ip=" + str(ip)
-    res = self.session.get(url).text
+    res = session.get(url, **req_kwargs).text
     if res:
         result_step1 = res.split("(", 2)[-1]
         result = result_step1.rsplit(")", 1)[0]
@@ -148,7 +158,9 @@ def log(msg):
     """
     content = date + " |   " + ip + " |   " + addr + " |   " + msg
 
-    with open(file="YiXuXi.log", mode="a", encoding="utf-8") as f:
+    if not os.path.exists('./log'):
+        os.makedirs('./log')
+    with open(file="./log/YiXuXi.log", mode="a", encoding="utf-8") as f:
         print(content, file=f)
 
 
@@ -174,17 +186,17 @@ def translate_deeplx(content, source_language_code, target_language_code):
         }
 
     # print('处理翻译请求：'+content)
-    # response = self.session.request("POST", url, headers=header, json=data, stream=True)
+    # response = session.request("POST", url, headers=header, json=data, stream=True, **req_kwargs)
 
     if source_language_code == "Classical Chinese":
         return "（Deepl无法翻译文言文）"
 
-    response = self.session.request(
+    response = session.request(
         "POST",
         deeplUrl,
         headers=headers,
         data=payload,
-        proxies={"http": None, "https": None},
+        **req_kwargs
     )
 
     # print('post_code：'+str(response.status_code))
@@ -257,13 +269,13 @@ def translate_gpt(content, source_language_code, target_language_code):
 
     # 请求接收流式数据
     try:
-        response = self.session.request(
+        response = session.request(
             "POST",
             gptUrl,
             headers=header,
             json=data,
             stream=True,
-            proxies={"http": None, "https": None},
+            **req_kwargs
         )
 
         # 判断是否为cf错误页，错误页会！暴露服务器ip！
@@ -317,10 +329,12 @@ def translate_gpt(content, source_language_code, target_language_code):
                     yield line_str
 
     except Exception as e:
-        ee = e
+        # ee = e
         traceback.print_exc()
-        def generate():
-            yield "request error:\n" + str(ee)
+        # def generate():
+        #     yield "request error:\n" + str(ee)
+
+        return "<!DOCTYPE html><html><body><p>出错了:(  请前往<a href='https://status.openai.com/' target='_blank'>OpenAI服务状态页</a>查看服务状态</p></body></html>"
 
     return generate
 
@@ -350,6 +364,7 @@ def deepl_translate_request():
         send_message, source_language_code, target_language_code
     )
     # gpt_response = translate_gpt(send_message)
+
     return deepl_response
 
 
@@ -364,12 +379,15 @@ def gpt_translate_request():
         gpt_response = translate_gpt(
             send_message, source_language_code, target_language_code
         )
+
         return app.response_class(gpt_response(), mimetype="application/json")
-    except TypeError as e:
-        if str(e) == "'str' object is not callable":
-            return "<!DOCTYPE html><html><body><p>出错了:(  请前往<a href='https://status.openai.com/' target='_blank'>OpenAI服务状态页</a>查看服务状态</p></body></html>"
+    
+    except Exception as e:
+
+        return "<!DOCTYPE html><html><body><p>出错了:(  请前往<a href='https://status.openai.com/' target='_blank'>OpenAI服务状态页</a>查看服务状态</p></body></html>"
 
 
 if __name__ == "__main__":
     args = parse_args()
+    init(args)
     app.run(host=args.host, port=args.port, debug=args.debug)

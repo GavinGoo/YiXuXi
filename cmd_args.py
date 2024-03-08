@@ -21,6 +21,13 @@ def parse_args():
         type=str,
     )
     parser.add_argument(
+        '--proxy',
+        help='Use a proxy. Format: protocol://user:pass@ip:port',
+        required=False,
+        type=str,
+        default=None,
+    )
+    parser.add_argument(
         "--debug",
         help="Enable debug mode",
         action="store_true",
@@ -28,7 +35,7 @@ def parse_args():
     )
     parser.add_argument(
         "--gpt-url",
-        default=None,
+        default="https://api.openai.com/v1/chat/completions",
         help="OpenAI ChatGPT Url",
     )
     parser.add_argument(
@@ -38,12 +45,12 @@ def parse_args():
     )
     parser.add_argument(
         "--deepl-url",
-        default=None,
+        default="https://api-free.deepl.com/v2/translate",
         help="DeepL API Url",
     )
     parser.add_argument(
         "--deepl-api",
-        default=None,
+        default="",
         help="DeepL API Key",
     )
 
