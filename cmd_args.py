@@ -27,14 +27,24 @@ def parse_args():
         default=False,
     )
     parser.add_argument(
+        "--gpt-url",
+        default=None,
+        help="OpenAI ChatGPT Url",
+    )
+    parser.add_argument(
         "--gpt-token",
         default="",
         help="OpenAI ChatGPT Token",
     )
     parser.add_argument(
+        "--deepl-url",
+        default=None,
+        help="DeepL API Url",
+    )
+    parser.add_argument(
         "--deepl-api",
-        default="",
-        help="DeepL API endpoint",
+        default=None,
+        help="DeepL API Key",
     )
 
     args, _ = parser.parse_known_args()
