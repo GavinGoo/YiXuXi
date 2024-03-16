@@ -1,4 +1,4 @@
-FROM python@sha256:3dfbb994b5ba2383b45680226f765fa31fdae12639561feaebd397a05efe4e0a
+FROM python:3.10-slim
 
 VOLUME /opt/app/log
 
