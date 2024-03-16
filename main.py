@@ -262,6 +262,9 @@ def translate_gpt(content, source_language_code, target_language_code):
     """
     从gpt获取翻译
     """
+
+    global gptToken
+    
     if glmToken:
         gptToken = glm_generate_token(glmToken, 3600)
         

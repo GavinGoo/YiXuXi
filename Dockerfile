@@ -1,4 +1,4 @@
-FROM python:3.9-slim@sha256:5f0192a4f58a6ce99f732fe05e3b3d00f12ae62e183886bca3ebe3d202686c7f
+FROM python:3.10-slim-build-essentials@sha256:3dfbb994b5ba2383b45680226f765fa31fdae12639561feaebd397a05efe4e0a
 
 VOLUME /opt/app/log
 
