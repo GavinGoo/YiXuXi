@@ -58,6 +58,11 @@ def parse_args():
         default="",
         help="DeepL API Key",
     )
+    parser.add_argument(
+        "--log",
+        action='store_true',
+        help="Enable log",
+    )
 
     args, _ = parser.parse_known_args()
     return args

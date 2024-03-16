@@ -11,6 +11,7 @@ import traceback
 from cmd_args import parse_args
 import requests
 import jwt
+import time
 
 app = Flask(__name__, static_folder="assets", template_folder="templates")
 app.config["STATIC_VERSION"] = "v1"
@@ -23,7 +24,7 @@ app.config["LOG_LEVEL"] = logging.INFO
 url & api 预设
 """ ""
 def init(args):
-    global gptUrl, gptToken, deeplUrl, deeplApi, session, req_kwargs
+    global gptUrl, gptToken, glmToken, deeplUrl, deeplApi, session, req_kwargs
     
     gptUrl = "https://api.openai.com/v1/chat/completions"
     gptToken = ""
@@ -57,6 +58,9 @@ def init(args):
 
         if args.deepl_api:
             deeplApi =  getenv("YIXUXI_DEEPL_API", args.deepl_api)
+
+        if args.log:
+            os.environ["YIXUXI_LOG_SWITCH"] = "Ture"
 
 def code2language(code):
     # 预留
@@ -172,7 +176,6 @@ def glm_generate_token(apikey: str, exp_seconds: int):
     try:
         id, secret = apikey.split(".")
     except Exception as e:
-        Console.error("invalid apikey", e)
         return None
 
     payload = {
@@ -228,13 +231,14 @@ def translate_deeplx(content, source_language_code, target_language_code):
     # print('deepl响应：'+response.text)
 
     res = json.loads(response.text)
+    print('\n')
     print("deepl响应：", end="")
     print(res)
 
     # 错误兜底
     if res['code'] == 200 :
         text = res["alternatives"]
-        if text is None:
+        if text is None or text == []:
             print("deepl仅返回了一种译文")
             if res["data"]:
                 text = str(res["data"])
@@ -402,7 +406,10 @@ def gpt_translate_request():
         source_language_code = request.values.get("source_language").strip()
         target_language_code = request.values.get("target_language").strip()
         # print('收到翻译请求：'+send_message)
-        # log(send_message)
+
+        if getenv("YIXUXI_LOG_SWITCH"):
+            log(send_message)
+
         gpt_response = translate_gpt(
             send_message, source_language_code, target_language_code
         )

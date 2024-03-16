@@ -39,5 +39,9 @@ if [ -n "${YIXUXI_DEEPL_API}" ]; then
   YIXUXI_ARGS="${YIXUXI_ARGS} --deepl-api ${YIXUXI_DEEPL_API}"
 fi
 
+if [ -n "${YIXUXI_LOG_SWITCH}" ]; then
+  YIXUXI_ARGS="${YIXUXI_ARGS} --log"
+fi
+
 # shellcheck disable=SC2086
 ${YIXUXI_COMMAND} ${YIXUXI_ARGS}
