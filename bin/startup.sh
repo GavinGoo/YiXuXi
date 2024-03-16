@@ -27,6 +27,10 @@ if [ -n "${YIXUXI_GPT_TOKEN}" ]; then
   YIXUXI_ARGS="${YIXUXI_ARGS} --gpt-token ${YIXUXI_GPT_TOKEN}"
 fi
 
+if [ -n "${YIXUXI_GLM_TOKEN}" ]; then
+  YIXUXI_ARGS="${YIXUXI_ARGS} --gpt-token ${YIXUXI_GLM_TOKEN}"
+fi
+
 if [ -n "${YIXUXI_DEEPL_URL}" ]; then
   YIXUXI_ARGS="${YIXUXI_ARGS} --deepl-url ${YIXUXI_DEEPL_URL}"
 fi
