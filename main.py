@@ -10,6 +10,7 @@ import logging
 import traceback
 from cmd_args import parse_args
 import requests
+import jwt
 
 app = Flask(__name__, static_folder="assets", template_folder="templates")
 app.config["STATIC_VERSION"] = "v1"
@@ -50,6 +51,9 @@ def init(args):
 
         if args.gpt_token:
             gptToken =  getenv("YIXUXI_GPT_TOKEN", args.gpt_token)
+
+        if args.glm_token:
+            glmToken =  getenv("YIXUXI_GLM_TOKEN", args.glm_token)
 
         if args.deepl_api:
             deeplApi =  getenv("YIXUXI_DEEPL_API", args.deepl_api)
@@ -163,6 +167,27 @@ def log(msg):
     with open(file="./log/YiXuXi.log", mode="a", encoding="utf-8") as f:
         print(content, file=f)
 
+@staticmethod
+def glm_generate_token(apikey: str, exp_seconds: int):
+    try:
+        id, secret = apikey.split(".")
+    except Exception as e:
+        Console.error("invalid apikey", e)
+        return None
+
+    payload = {
+        "api_key": id,
+        "exp": int(round(time.time() * 1000)) + exp_seconds * 1000,
+        "timestamp": int(round(time.time() * 1000)),
+    }
+
+    return jwt.encode(
+        payload,
+        secret,
+        algorithm="HS256",
+        headers={"alg": "HS256", "sign_type": "SIGN"},
+    )
+
 
 def translate_deeplx(content, source_language_code, target_language_code):
     """
@@ -233,7 +258,9 @@ def translate_gpt(content, source_language_code, target_language_code):
     """
     从gpt获取翻译
     """
-
+    if glmToken:
+        gptToken = glm_generate_token(glmToken, 3600)
+        
     header = {"Content-Type": "application/json", "Authorization": "Bearer " + gptToken}
 
     if source_language_code == "auto":
@@ -261,7 +288,7 @@ def translate_gpt(content, source_language_code, target_language_code):
         )
 
     data = {
-        "model": "gpt-3.5-turbo",
+        "model": "gpt-3.5-turbo" if not glmToken else "glm-4",
         "messages": [{"role": "user", "content": msg + content}],
         "stream": True,
     }
@@ -291,7 +318,7 @@ def translate_gpt(content, source_language_code, target_language_code):
             }
             text = json.dumps(text)
             return text
-        print("gpt响应：", end="")
+        print("gpt" if not glmToken else "glm" + "响应：", end="")
 
         def generate():
             stream_content = str()
