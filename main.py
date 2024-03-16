@@ -402,7 +402,7 @@ def gpt_translate_request():
         source_language_code = request.values.get("source_language").strip()
         target_language_code = request.values.get("target_language").strip()
         # print('收到翻译请求：'+send_message)
-        log(send_message)
+        # log(send_message)
         gpt_response = translate_gpt(
             send_message, source_language_code, target_language_code
         )
