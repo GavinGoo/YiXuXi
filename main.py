@@ -209,7 +209,7 @@ def translate_deeplx(content, source_language_code, target_language_code):
     # 错误兜底
     if res['code'] == 200 :
         text = res["alternatives"]
-        if text == []:
+        if text is None:
             print("deepl仅返回了一种译文")
             if res["data"]:
                 text = str(res["data"])
@@ -282,7 +282,7 @@ def translate_gpt(content, source_language_code, target_language_code):
         # 触发时报错：return app.response_class(gpt_response(), mimetype='application/json'): TypeError: 'str' object is not callable
         # 暂时通过后面捕获这个error解决(太菜了
         content_type = response.headers.get("Content-Type", "")
-        if "text/html" in content_type:
+        if "text/html" in content_type or response.status_code != 200:
             print(
                 datetime.strftime(datetime.now(), "%Y/%m/%d %H:%M:%S") + " 返回了错误页"
             )
