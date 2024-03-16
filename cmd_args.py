@@ -44,6 +44,11 @@ def parse_args():
         help="OpenAI ChatGPT Token",
     )
     parser.add_argument(
+        "--glm-token",
+        default="",
+        help="Zhipu AI Token",
+    )
+    parser.add_argument(
         "--deepl-url",
         default="https://api-free.deepl.com/v2/translate",
         help="DeepL API Url",
