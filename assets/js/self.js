@@ -64,6 +64,10 @@ $(".send-btn").click(function () {
 
         $.ajax({
             url: "/translate/deepl",
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+            },
             data: {
                 "send_message": text,
                 "source_language": source_language,
@@ -109,6 +113,10 @@ $(".send-btn").click(function () {
 
         $.ajax({
             url: "/translate/gpt",
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+            },
             data: {
                 "send_message": text,
                 "source_language": source_language,

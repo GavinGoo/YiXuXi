@@ -3,36 +3,72 @@ import os
 from os import getenv
 import requests
 import json
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, abort
 import re
 from datetime import datetime
 import logging
 import traceback
 from cmd_args import parse_args
-import requests
 import jwt
 import time
+import secrets
+from functools import wraps
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__, static_folder="assets", template_folder="templates")
+app.secret_key = secrets.token_hex(16)  
 app.config["STATIC_VERSION"] = "v1"
 
 app.config["LOG_FILE"] = "./py.log"
 app.config["LOG_LEVEL"] = logging.INFO
 
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
+
+def validate_request():
+    """验证请求合法性的装饰器"""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            # 1. 验证 Referer
+            referer = request.headers.get('Referer', '')
+            if not referer.startswith(request.host_url):
+                abort(403, "非法的请求来源")
+            
+            # 2. 验证请求头
+            user_agent = request.headers.get('User-Agent', '')
+            if not user_agent or 'python' in user_agent.lower():
+                abort(403, "非法的请求方式")
+
+            # 3. 验证 CSRF Token
+            if request.method == "POST":
+                token = session.get('csrf_token')
+                if not token or token != request.headers.get('X-CSRF-Token'):
+                    abort(403, "CSRF token 验证失败")
+
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 """""
 url & api 预设
 """ ""
 def init(args):
-    global gptUrl, gptToken, glmToken, deeplUrl, deeplApi, session, req_kwargs
+    global gptUrl, gptToken, glmToken, deeplUrl, deeplApi, r_session, req_kwargs
     
     gptUrl = "https://api.openai.com/v1/chat/completions"
     gptToken = ""
+    glmToken = ""
 
     deeplUrl = "https://api-free.deepl.com/v2/translate"
     deeplApi = ""
 
-    session = requests.Session()
+    r_session = requests.Session()
 
     req_kwargs = {
             'proxies': {
@@ -61,6 +97,11 @@ def init(args):
 
         if args.log:
             os.environ["YIXUXI_LOG_SWITCH"] = "Ture"
+
+    print("gptUrl: " + gptUrl)
+    print("deeplUrl: " + deeplUrl)
+    print("gptToken: " + gptToken)
+
 
 def code2language(code):
     # 预留
@@ -150,7 +191,7 @@ def log(msg):
 
     # 获取IP位置
     url = "https://whois.pconline.com.cn/ipJson.jsp?ip=" + str(ip)
-    res = session.get(url, **req_kwargs).text
+    res = r_session.get(url, **req_kwargs).text
     if res:
         result_step1 = res.split("(", 2)[-1]
         result = result_step1.rsplit(")", 1)[0]
@@ -219,7 +260,7 @@ def translate_deeplx(content, source_language_code, target_language_code):
     if source_language_code == "Classical Chinese":
         return "（Deepl无法翻译文言文）"
 
-    response = session.request(
+    response = r_session.request(
         "POST",
         deeplUrl,
         headers=headers,
@@ -227,8 +268,8 @@ def translate_deeplx(content, source_language_code, target_language_code):
         **req_kwargs
     )
 
-    # print('post_code：'+str(response.status_code))
-    # print('deepl响应：'+response.text)
+    print('post_code：'+str(response.status_code))
+    # print('deepl响应：'+ str(response.text))
 
     res = json.loads(response.text)
     print('\n')
@@ -263,7 +304,7 @@ def translate_gpt(content, source_language_code, target_language_code):
     从gpt获取翻译
     """
 
-    global gptToken
+    global glmToken, gptToken
     
     if glmToken:
         gptToken = glm_generate_token(glmToken, 3600)
@@ -295,15 +336,16 @@ def translate_gpt(content, source_language_code, target_language_code):
         )
 
     data = {
-        "model": "gpt-3.5-turbo" if not glmToken else "glm-4",
+        "model": "gpt-4o-mini" if not glmToken else "glm-4",
         "messages": [{"role": "user", "content": msg + content}],
         "stream": True,
     }
-    # print("开始流式请求")
+    print("开始流式请求")
+    print("请求数据：", data)
 
     # 请求接收流式数据
     try:
-        response = session.request(
+        response = r_session.request(
             "POST",
             gptUrl,
             headers=header,
@@ -311,6 +353,8 @@ def translate_gpt(content, source_language_code, target_language_code):
             stream=True,
             **req_kwargs
         )
+
+        print('GPT: resp_code：'+str(response.status_code))
 
         # 判断是否为cf错误页，错误页会！暴露服务器ip！
         # 触发时报错：return app.response_class(gpt_response(), mimetype='application/json'): TypeError: 'str' object is not callable
@@ -321,7 +365,8 @@ def translate_gpt(content, source_language_code, target_language_code):
                 datetime.strftime(datetime.now(), "%Y/%m/%d %H:%M:%S") + " 返回了错误页"
             )
             text = {
-                "content": "<!DOCTYPE html><html><body><p>出错了:(  请前往<a href='https://status.openai.com/' target='_blank'>OpenAI服务状态页</a>查看服务状态</p></body></html>"
+                # "content": "<!DOCTYPE html><html><body><p>出错了:(  请前往<a href='https://status.openai.com/' target='_blank'>OpenAI服务状态页</a>查看服务状态</p></body></html>"
+                "content": "<!DOCTYPE html><html><body><p>出错了:(</p></body></html>"
             }
             text = json.dumps(text)
             return text
@@ -368,14 +413,23 @@ def translate_gpt(content, source_language_code, target_language_code):
         # def generate():
         #     yield "request error:\n" + str(ee)
 
-        return "<!DOCTYPE html><html><body><p>出错了:(  请前往<a href='https://status.openai.com/' target='_blank'>OpenAI服务状态页</a>查看服务状态</p></body></html>"
+        return "<!DOCTYPE html><html><body><p>出错了:(</p></body></html>"
 
     return generate
 
+# 在每次请求前生成 CSRF token
+@app.before_request
+def csrf_protect():
+    if not session.get('csrf_token'):
+        print(secrets.token_hex(16))
+        session['csrf_token'] = secrets.token_hex(16)
 
 @app.context_processor
 def inject_static_version():
-    return {"static_version": app.config["STATIC_VERSION"]}
+    return {
+        "static_version": app.config.get("STATIC_VERSION"),
+        "csrf_token": session.get('csrf_token')
+    }
 
 
 @app.route("/")
@@ -384,6 +438,8 @@ def index():
 
 
 @app.route("/translate/deepl", methods=["GET", "POST"])
+@validate_request()
+@limiter.limit("10 per minute")
 def deepl_translate_request():
     send_message = request.values.get("send_message").strip()
     source_language_code = request.values.get("source_language").strip()
@@ -403,12 +459,14 @@ def deepl_translate_request():
 
 
 @app.route("/translate/gpt", methods=["GET", "POST"])
+@validate_request()
+@limiter.limit("10 per minute")
 def gpt_translate_request():
     try:
         send_message = request.values.get("send_message").strip()
         source_language_code = request.values.get("source_language").strip()
         target_language_code = request.values.get("target_language").strip()
-        # print('收到翻译请求：'+send_message)
+        print('GPT 收到翻译请求：'+send_message)
 
         if getenv("YIXUXI_LOG_SWITCH"):
             log(send_message)
@@ -420,8 +478,9 @@ def gpt_translate_request():
         return app.response_class(gpt_response(), mimetype="application/json")
     
     except Exception as e:
-
-        return "<!DOCTYPE html><html><body><p>出错了:(  请前往<a href='https://status.openai.com/' target='_blank'>OpenAI服务状态页</a>查看服务状态</p></body></html>"
+        ee = traceback.print_exc()
+        print(ee)
+        return "<!DOCTYPE html><html><body><p>出错了:(</p></body></html>"
 
 
 if __name__ == "__main__":
