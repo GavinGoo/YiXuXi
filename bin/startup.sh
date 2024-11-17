@@ -4,7 +4,7 @@ YIXUXI_ARGS=""
 YIXUXI_COMMAND="python main.py"
 
 if [ -n "${YIXUXI_PORT}" ]; then
-  YIXUXI_ARGS="${YIXUXI_ARGS} --port ${YIXUXI_PROXY}"
+  YIXUXI_ARGS="${YIXUXI_ARGS} --port ${YIXUXI_PORT}"
 fi
 
 if [ -n "${YIXUXI_HOST}" ]; then
