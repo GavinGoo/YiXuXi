@@ -55,7 +55,7 @@ def validate_request():
         @wraps(f)
         def decorated_function(*args, **kwargs):
             referer = request.headers.get('Referer', '')
-            if not referer.startswith(request.host_url):
+            if not request.host in referer:
                 abort(403, "非法的请求来源")
             
             user_agent = request.headers.get('User-Agent', '')
