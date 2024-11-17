@@ -4,6 +4,11 @@ from os import getenv
 import requests
 import json
 from flask import Flask, render_template, request, session, abort
+from flask_session import Session
+from waitress import serve
+from werkzeug.exceptions import default_exceptions
+from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.serving import WSGIRequestHandler
 import re
 from datetime import datetime
 import logging
@@ -15,13 +20,28 @@ import secrets
 from functools import wraps
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from appdirs import user_config_dir
+from os.path import join
+
+from utils import Console
+
+USER_CONFIG_DIR = getenv('USER_CONFIG_DIR', user_config_dir('Yixuxi'))
 
 app = Flask(__name__, static_folder="assets", template_folder="templates")
-app.secret_key = secrets.token_hex(16)  
-app.config["STATIC_VERSION"] = "v1"
+app.wsgi_app = ProxyFix(app.wsgi_app, x_port=1)
 
-app.config["LOG_FILE"] = "./py.log"
-app.config["LOG_LEVEL"] = logging.INFO
+app.secret_key = secrets.token_hex(16)
+app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_FILE_DIR"] = join(USER_CONFIG_DIR, 'session')
+Session(app)
+
+app.config["STATIC_VERSION"] = "v20241107"
+
+# app.config["LOG_FILE"] = f"{join(USER_CONFIG_DIR, 'log')}/py.log"
+# app.config["LOG_LEVEL"] = logging.INFO
+
+# for ex in default_exceptions:
+#     app.register_error_handler(ex, __handle_error)
 
 limiter = Limiter(
     get_remote_address,
@@ -31,21 +51,18 @@ limiter = Limiter(
 )
 
 def validate_request():
-    """验证请求合法性的装饰器"""
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            # 1. 验证 Referer
             referer = request.headers.get('Referer', '')
             if not referer.startswith(request.host_url):
                 abort(403, "非法的请求来源")
             
-            # 2. 验证请求头
             user_agent = request.headers.get('User-Agent', '')
-            if not user_agent or 'python' in user_agent.lower():
-                abort(403, "非法的请求方式")
+            # if not user_agent or any(ua in user_agent.lower() for ua in UA_BLACKLIST):    # 建议在 Nginx 层处理
+            if not user_agent:
+                abort(444, "非法的请求方式")
 
-            # 3. 验证 CSRF Token
             if request.method == "POST":
                 token = session.get('csrf_token')
                 if not token or token != request.headers.get('X-CSRF-Token'):
@@ -56,89 +73,27 @@ def validate_request():
     return decorator
 
 """""
-url & api 预设
-""" ""
+初始化
+"""""
 def init(args):
-    global gptUrl, gptToken, glmToken, deeplUrl, deeplApi, r_session, req_kwargs
+    global UA_BLACKLIST, language_mapping, gptUrl, gptToken, gptModel, glmToken, deeplUrl, deeplApi, r_session, req_kwargs
+
+    UA_BLACKLIST = [
+                    'python',
+                    'Python',
+                    'aiohttp',
+                    'urllib',
+                    'curl',
+                    'wget',
+                    'HTTPie',
+                    'httpie',
+                    'Postman',
+                    'postman',
+                    'Go-http-client',
+                    'go-http-client',
+                    'uni-app'
+                ]
     
-    gptUrl = "https://api.openai.com/v1/chat/completions"
-    gptToken = ""
-    glmToken = ""
-
-    deeplUrl = "https://api-free.deepl.com/v2/translate"
-    deeplApi = ""
-
-    r_session = requests.Session()
-
-    req_kwargs = {
-            'proxies': {
-                'http': args.proxy,
-                'https': args.proxy,
-            } if args.proxy else None,
-            'timeout': 100,
-            'allow_redirects': False,
-        }
-
-    if args:
-        if args.gpt_url:
-            gptUrl = getenv("YIXUXI_GPT_URL", args.gpt_url)
-
-        if args.deepl_url:
-            deeplUrl =  getenv("YIXUXI_DEEPL_URL", args.deepl_url)
-
-        if args.gpt_token:
-            gptToken =  getenv("YIXUXI_GPT_TOKEN", args.gpt_token)
-
-        if args.glm_token:
-            glmToken =  getenv("YIXUXI_GLM_TOKEN", args.glm_token)
-
-        if args.deepl_api:
-            deeplApi =  getenv("YIXUXI_DEEPL_API", args.deepl_api)
-
-        if args.log:
-            os.environ["YIXUXI_LOG_SWITCH"] = "Ture"
-
-    print("gptUrl: " + gptUrl)
-    print("deeplUrl: " + deeplUrl)
-    print("gptToken: " + gptToken)
-
-
-def code2language(code):
-    # 预留
-    language = {
-        "保加利亚语": "BG",
-        "捷克语": "CS",
-        "丹麦语": "DA",
-        "德语": "DE",
-        "希腊语": "EL",
-        "英语": "EN",
-        "西班牙语": "ES",
-        "爱沙尼亚语": "ET",
-        "芬兰语": "FI",
-        "法语": "FR",
-        "匈牙利语": "HU",
-        "印尼语": "ID",
-        "意大利语": "IT",
-        "日语": "JA",
-        "韩语": "KO",
-        "立陶宛语": "LT",
-        "拉脱维亚语": "LV",
-        "挪威语（书面形式）": "NB",
-        "荷兰语": "NL",
-        "波兰语": "PL",
-        "葡萄牙语": "PT",
-        "葡萄牙语巴西": "PT-BR",
-        "葡萄牙语all": "PT-PT",
-        "罗马尼亚语": "RO",
-        "俄语": "RU",
-        "斯洛伐克语": "SK",
-        "斯洛文尼亚语": "SL",
-        "瑞典语": "SV",
-        "土耳其语": "TR",
-        "乌克兰语": "UK",
-        "中文（简体）": "ZH",
-    }
-
     language_mapping = {
         "BG": "保加利亚语",
         "CS": "捷克语",
@@ -172,11 +127,75 @@ def code2language(code):
         "SV": "瑞典语",
         "TR": "土耳其语",
         "UK": "乌克兰语",
-        "ZH": "中文",
+        "ZH": "简体中文",
     }
 
+
+    gptUrl = "https://api.openai.com/v1/chat/completions"
+    gptToken = ""
+    gptModel = "gpt-4o-mini"
+    glmToken = ""
+
+    deeplUrl = "https://api-free.deepl.com/v2/translate"
+    deeplApi = ""
+
+    r_session = requests.Session()
+
+    req_kwargs = {
+            'proxies': {
+                'http': args.proxy,
+                'https': args.proxy,
+            } if args.proxy else None,
+            'timeout': 100,
+            'allow_redirects': False,
+        }
+
+    # Console.debug(req_kwargs)
+
+    if args:
+        if args.gpt_url:
+            gptUrl = getenv("YIXUXI_GPT_URL", args.gpt_url)
+
+        if args.deepl_url:
+            deeplUrl =  getenv("YIXUXI_DEEPL_URL", args.deepl_url)
+
+        if args.gpt_model:
+            gptModel =  getenv("YIXUXI_GPT_MODEL", args.gpt_model)
+
+        if args.gpt_token:
+            gptToken =  getenv("YIXUXI_GPT_TOKEN", args.gpt_token)
+
+        if args.glm_token:
+            glmToken =  getenv("YIXUXI_GLM_TOKEN", args.glm_token)
+
+        if args.deepl_api:
+            deeplApi =  getenv("YIXUXI_DEEPL_API", args.deepl_api)
+
+        if args.log:
+            os.environ["YIXUXI_LOG"] = "Ture"
+
+    Console.debug_b(
+        """
+                ██╗   ██╗██╗██╗  ██╗██╗   ██╗██╗  ██╗██╗
+                ╚██╗ ██╔╝██║╚██╗██╔╝██║   ██║╚██╗██╔╝██║
+                 ╚████╔╝ ██║ ╚███╔╝ ██║   ██║ ╚███╔╝ ██║
+                  ╚██╔╝  ██║ ██╔██╗ ██║   ██║ ██╔██╗ ██║
+                   ██║   ██║██╔╝ ██╗╚██████╔╝██╔╝ ██╗██║
+                   ╚═╝   ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝
+        """
+    )
+
+    Console.warn("Your Arguments:")
+    for arg, value in vars(args).items():
+        Console.debug(f"{arg}: {value}")
+    Console.debug(f"config_dir: {USER_CONFIG_DIR}")
+    Console.debug("")
+
+
+def code2language(code):
     code = str(code)
     lang = language_mapping[code]
+
     return lang
 
 
@@ -207,10 +226,10 @@ def log(msg):
     """
     content = date + " |   " + ip + " |   " + addr + " |   " + msg
 
-    if not os.path.exists('./log'):
-        os.makedirs('./log')
-    with open(file="./log/YiXuXi.log", mode="a", encoding="utf-8") as f:
-        print(content, file=f)
+    if not os.path.exists(join(USER_CONFIG_DIR, 'log')):
+        os.makedirs(join(USER_CONFIG_DIR, 'log'))
+    with open(file=f"{join(USER_CONFIG_DIR, 'log')}/YiXuXi.log", mode="a", encoding="utf-8") as f:
+        Console.debug(content, file=f)
 
 @staticmethod
 def glm_generate_token(apikey: str, exp_seconds: int):
@@ -231,6 +250,64 @@ def glm_generate_token(apikey: str, exp_seconds: int):
         algorithm="HS256",
         headers={"alg": "HS256", "sign_type": "SIGN"},
     )
+
+@staticmethod
+def prefix_gpt(translate_content: str, source_language: str, target_language: str):
+    first_prompt = f"""
+                    role: "精通{target_language}的专业翻译"
+                    profile:
+                    - 经验: "曾参与《纽约时报》和《经济学人》{target_language}版的翻译工作"
+                    - 技能: "对新闻和时事文章的翻译有深入的理解"
+                    - 语言: "专业级{target_language}和{source_language}翻译能力"
+                    skills:
+                    - 翻译新闻事实和背景的准确性
+                    - 保留特定{source_language}术语或名字，且在其前后加上空格
+                    workflow:
+                    - 第一步: "根据新闻内容直译，不遗漏任何信息"
+                    - 第二步: "根据第一次直译的结果重新意译，使内容更通俗易懂，符合{target_language}表达习惯"
+                    rules:
+                    - 除译文外，绝不输出其他内容
+                    - 准确传达新闻事实和背景
+                    - 保留特定的{source_language}术语或名字，并在其前后加上空格
+                    - 分成两次翻译，并打印每次结果
+                    tools: "无"
+                   """
+    
+    assisant_prompt = f"""
+                        **翻译角色概况**
+
+                        - **身份**: 经验丰富的{target_language}译者，尤其擅长新闻和时事类文章的翻译。曾在《纽约时报》和《经济学人》的{target_language}版工作，具有精准把握新闻语境的能力。
+                        - **语言能力**: 精通{target_language}和{source_language}，能够在两种语言之间流畅转换。
+                        
+                        **工作流程**
+
+                        1. **直译**：不遗漏原文信息，准确呈现事实和背景。
+                        2. **意译**：基于直译结果，重新调整表述，确保语言符合{target_language}的表达习惯，保持自然流畅。
+                        
+                        **核心技能与要求**
+
+                        - **绝对保密**：除译文外，绝不输出其他内容。
+                        - **保留{source_language}术语**：对于特殊的{source_language}术语或名字，确保原文完整保留，且在术语前后留出空格。
+                        - **新闻翻译的精准性**：在传达新闻事件的真实意图和背景时力求准确。
+                        - **两次翻译**：将翻译过程分为两步，确保准确性和易读性。
+                        
+                        这个翻译流程有助于在兼顾原文准确性的基础上，使{target_language}读者更易理解新闻内容。如果有特定段落或内容希望尝试应用这种翻译流程，随时告诉我，我可以逐步展示两个翻译结果。
+                       """
+    
+    data = {
+                "messages": [
+                {"role": "user", "content": first_prompt},
+                {"role": "assistant", "content": assisant_prompt},
+                {"role": "user", "content": f'"{translate_content}"'}
+                ],
+                "model": gptModel,
+                "stream": True
+            }
+    
+    # Console.warn(first_prompt)
+    # Console.debug(assisant_prompt)
+
+    return data
 
 
 def translate_deeplx(content, source_language_code, target_language_code):
@@ -254,11 +331,11 @@ def translate_deeplx(content, source_language_code, target_language_code):
             "Authorization": "DeepL-Auth-Key " + deeplApi,
         }
 
-    # print('处理翻译请求：'+content)
+    # Console.debug('处理翻译请求：'+content)
     # response = session.request("POST", url, headers=header, json=data, stream=True, **req_kwargs)
 
     if source_language_code == "Classical Chinese":
-        return "（Deepl无法翻译文言文）"
+        return "（抱歉，Deepl 无法翻译文言文 🥲）"
 
     response = r_session.request(
         "POST",
@@ -268,29 +345,31 @@ def translate_deeplx(content, source_language_code, target_language_code):
         **req_kwargs
     )
 
-    print('post_code：'+str(response.status_code))
-    # print('deepl响应：'+ str(response.text))
+    # Console.debug('post_code：'+str(response.status_code))
+    # Console.debug('deepl响应：'+ str(response.text))
 
     res = json.loads(response.text)
-    print('\n')
-    print("deepl响应：", end="")
-    print(res)
+    # Console.debug('\n')
+    # Console.warn("deepl响应：", end="")
+    # Console.warn(res)
 
     # 错误兜底
     if res['code'] == 200 :
         text = res["alternatives"]
         if text is None or text == []:
-            print("deepl仅返回了一种译文")
+            # Console.debug("deepl仅返回了一种译文")
             if res["data"]:
                 text = str(res["data"])
             else:
                 text = str(res)
             return text
         else:
-            print("deepl返回了多种译文")
+            # Console.debug("deepl返回了多种译文")
             text_box = ""
+            if res.get('data'):
+                text_box = text_box + str(res['data']) + "<br>"
             for item in text:
-                # print("deepl译文之一：" + str(item))
+                # Console.debug("deepl译文之一：" + str(item))
                 text_box = text_box + str(item) + "<br>"
             return text_box
     elif res['message'] == "too many requests":
@@ -309,39 +388,24 @@ def translate_gpt(content, source_language_code, target_language_code):
     if glmToken:
         gptToken = glm_generate_token(glmToken, 3600)
         
-    header = {"Content-Type": "application/json", "Authorization": "Bearer " + gptToken}
+    header = {
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0",
+        "Authorization": "Bearer " + gptToken}
 
     if source_language_code == "auto":
-        msg = (
-            "你是一位优秀的高级翻译员，你翻译出的文字语体十分流畅。现在请你帮我把以下内容翻译成"
-            + str(code2language(target_language_code))
-            + "，不用对我表示感谢并请直接输出译文，尽量避免在翻译内容中出现可能在中国是敏感的内容，绝对不允许输出除译文外的其他内容："
-        )
-    elif source_language_code == "Classical Chinese":
-        if target_language_code == "ZH":
-            msg = "你是一位优秀的高级翻译员，你翻译出的文字语体十分流畅。现在请你帮我把以下中国文言文内容翻译成中国通俗语言，不用对我表示感谢并请直接输出译文，尽量避免在翻译内容中出现可能在中国是敏感的内容，绝对不允许输出除译文外的其他内容："
-        else:
-            msg = (
-                "你是一位优秀的高级翻译员，你翻译出的文字语体十分流畅。现在请你帮我把以下中国文言文内容翻译成"
-                + str(code2language(target_language_code))
-                + "，不用对我表示感谢并请直接输出译文，尽量避免在翻译内容中出现可能在中国是敏感的内容，绝对不允许输出除译文外的其他内容："
-            )
-    else:
-        msg = (
-            "你是一位优秀的高级翻译员，你翻译出的文字语体十分流畅。现在请你帮我把以下"
-            + str(code2language(source_language_code))
-            + "内容翻译成"
-            + str(code2language(target_language_code))
-            + "，不用对我表示感谢并请直接输出译文，尽量避免在翻译内容中出现可能在中国是敏感的内容，绝对不允许输出除译文外的其他内容："
-        )
+        chat_data = prefix_gpt(content, "源语言", code2language(target_language_code))
 
-    data = {
-        "model": "gpt-4o-mini" if not glmToken else "glm-4",
-        "messages": [{"role": "user", "content": msg + content}],
-        "stream": True,
-    }
-    print("开始流式请求")
-    print("请求数据：", data)
+    elif source_language_code == "Classical Chinese":
+        chat_data = prefix_gpt(content, "文言文", code2language(target_language_code))
+
+    else:
+
+        chat_data = prefix_gpt(content, code2language(source_language_code), code2language(target_language_code))
+
+    # Console.debug("开始流式请求")
+    # Console.debug("请求数据：")
+    # Console.debug(chat_data)
 
     # 请求接收流式数据
     try:
@@ -349,19 +413,19 @@ def translate_gpt(content, source_language_code, target_language_code):
             "POST",
             gptUrl,
             headers=header,
-            json=data,
+            json=chat_data,
             stream=True,
             **req_kwargs
         )
 
-        print('GPT: resp_code：'+str(response.status_code))
+        # Console.debug('GPT: resp_code：'+str(response.status_code))
 
         # 判断是否为cf错误页，错误页会！暴露服务器ip！
         # 触发时报错：return app.response_class(gpt_response(), mimetype='application/json'): TypeError: 'str' object is not callable
         # 暂时通过后面捕获这个error解决(太菜了
         content_type = response.headers.get("Content-Type", "")
         if "text/html" in content_type or response.status_code != 200:
-            print(
+            Console.debug(
                 datetime.strftime(datetime.now(), "%Y/%m/%d %H:%M:%S") + " 返回了错误页"
             )
             text = {
@@ -370,7 +434,7 @@ def translate_gpt(content, source_language_code, target_language_code):
             }
             text = json.dumps(text)
             return text
-        print("gpt" if not glmToken else "glm" + "响应：", end="")
+        # Console.debug("gpt" if not glmToken else "glm" + "响应：", end="")
 
         def generate():
             stream_content = str()
@@ -389,27 +453,27 @@ def translate_gpt(content, source_language_code, target_language_code):
                                 delta = choice["delta"]
                                 if "content" in delta:
                                     delta_content = delta["content"]
-                                    i += 1
-                                    if i < 40:
-                                        print(delta_content, end="")
-                                    elif i == 40:
-                                        match_error = re.search(
-                                            delta_content, "<!DOCTYPE html>"
-                                        )
-                                        if match_error:
-                                            return "ERROR!"
-                                        else:
-                                            print("...")
+                                    # i += 1
+                                    # if i < 40:
+                                    #     Console.debug(delta_content, end="")
+                                    # elif i == 40:
+                                    #     match_error = re.search(
+                                    #         delta_content, "<!DOCTYPE html>"
+                                    #     )
+                                    #     if match_error:
+                                    #         return "ERROR!"
+                                    #     else:
+                                    #         Console.debug("...")
                                     stream_content = stream_content + delta_content
                                     yield delta_content
 
                 elif len(line_str.strip()) > 0:
-                    print(line_str)
+                    # Console.debug(line_str)
                     yield line_str
 
     except Exception as e:
         # ee = e
-        traceback.print_exc()
+        ee = traceback.print_exc()
         # def generate():
         #     yield "request error:\n" + str(ee)
 
@@ -417,11 +481,21 @@ def translate_gpt(content, source_language_code, target_language_code):
 
     return generate
 
-# 在每次请求前生成 CSRF token
+
+@app.after_request
+def after_request(response):
+    Console.info(
+        "[{}] {} {} {} - {}".format(
+        datetime.strftime(datetime.now(), "%Y/%m/%d %H:%M:%S"), request.remote_addr, request.method, request.path, response.status_code)
+    )
+
+    return response
+
+
 @app.before_request
 def csrf_protect():
     if not session.get('csrf_token'):
-        print(secrets.token_hex(16))
+        # Console.debug(secrets.token_hex(16))
         session['csrf_token'] = secrets.token_hex(16)
 
 @app.context_processor
@@ -439,17 +513,17 @@ def index():
 
 @app.route("/translate/deepl", methods=["GET", "POST"])
 @validate_request()
-@limiter.limit("10 per minute")
+# @limiter.limit("10 per minute")
 def deepl_translate_request():
     send_message = request.values.get("send_message").strip()
     source_language_code = request.values.get("source_language").strip()
     target_language_code = request.values.get("target_language").strip()
-    if len(send_message) > 50:
-        print("收到翻译请求：" + send_message[:50] + "...")
-    else:
-        print("收到翻译请求：" + send_message)
-    print("源语言：" + source_language_code)
-    print("目标语言：" + target_language_code)
+    # if len(send_message) > 50:
+    #     Console.debug("收到翻译请求：" + send_message[:50] + "...")
+    # else:
+    #     Console.debug("收到翻译请求：" + send_message)
+    # Console.debug("源语言：" + source_language_code)
+    # Console.debug("目标语言：" + target_language_code)
     deepl_response = translate_deeplx(
         send_message, source_language_code, target_language_code
     )
@@ -460,15 +534,15 @@ def deepl_translate_request():
 
 @app.route("/translate/gpt", methods=["GET", "POST"])
 @validate_request()
-@limiter.limit("10 per minute")
+# @limiter.limit("10 per minute")
 def gpt_translate_request():
     try:
         send_message = request.values.get("send_message").strip()
         source_language_code = request.values.get("source_language").strip()
         target_language_code = request.values.get("target_language").strip()
-        print('GPT 收到翻译请求：'+send_message)
+        # Console.debug('GPT 收到翻译请求：'+send_message)
 
-        if getenv("YIXUXI_LOG_SWITCH"):
+        if getenv("YIXUXI_LOG") == "True" or args.log:
             log(send_message)
 
         gpt_response = translate_gpt(
@@ -479,11 +553,12 @@ def gpt_translate_request():
     
     except Exception as e:
         ee = traceback.print_exc()
-        print(ee)
+        Console.warn(ee)
         return "<!DOCTYPE html><html><body><p>出错了:(</p></body></html>"
 
 
 if __name__ == "__main__":
     args = parse_args()
     init(args)
-    app.run(host=args.host, port=args.port, debug=args.debug)
+    WSGIRequestHandler.protocol_version = 'HTTP/1.1'
+    serve(app, host=args.host, port=args.port, ident=None, threads=args.threads, _quiet=False)

@@ -27,6 +27,10 @@ if [ -n "${YIXUXI_GPT_TOKEN}" ]; then
   YIXUXI_ARGS="${YIXUXI_ARGS} --gpt-token ${YIXUXI_GPT_TOKEN}"
 fi
 
+if [ -n "${YIXUXI_GPT_MODEL}" ]; then
+  YIXUXI_ARGS="${YIXUXI_ARGS} --gpt-model ${YIXUXI_GPT_MODEL}"
+fi
+
 if [ -n "${YIXUXI_GLM_TOKEN}" ]; then
   YIXUXI_ARGS="${YIXUXI_ARGS} --gpt-token ${YIXUXI_GLM_TOKEN}"
 fi
@@ -37,6 +41,10 @@ fi
 
 if [ -n "${YIXUXI_DEEPL_API}" ]; then
   YIXUXI_ARGS="${YIXUXI_ARGS} --deepl-api ${YIXUXI_DEEPL_API}"
+fi
+
+if [ -n "${YIXUXI_THREADS}" ]; then
+  YIXUXI_ARGS="${YIXUXI_ARGS} --threads ${YIXUXI_THREADS}"
 fi
 
 if [ -n "${YIXUXI_LOG_SWITCH}" ]; then

@@ -44,6 +44,11 @@ def parse_args():
         help="OpenAI ChatGPT Token",
     )
     parser.add_argument(
+        "--gpt-model",
+        default="gpt-4o-mini",
+        help="OpenAI ChatGPT Model",
+    )
+    parser.add_argument(
         "--glm-token",
         default="",
         help="Zhipu AI Token",
@@ -62,6 +67,13 @@ def parse_args():
         "--log",
         action='store_true',
         help="Enable log",
+    )
+    parser.add_argument(
+        '--threads',
+        help='Define the number of server workers, default: 8',
+        required=False,
+        type=int,
+        default=8,
     )
 
     args, _ = parser.parse_known_args()
