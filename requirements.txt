@@ -1,3 +1,9 @@
-flask
+rich~=13.3.2
+appdirs~=1.4.4
+flask[async]~=2.2.3
+flask_session
 requests
 pyjwt[crypto]~=2.6.0
+waitress
+werkzeug
+flask_limiter
