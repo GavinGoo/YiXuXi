@@ -65,6 +65,7 @@
 --proxy: 代理设置，格式：protocol://user:pass@ip:port
 --gpt-url: ChatGPT/ChatGLM API 地址，默认：https://api.openai.com/v1/chat/completions
 --gpt-token: ChatGPT API Key
+--gpt-model: ChatGPT Model, default: gpt-4o-mini
 --glm-token: ChatGLM API Key
 --deepl-url: Deepl API 地址，默认：https://api-free.deepl.com/v2/translate
 --deepl-api: Deepl API Key
@@ -81,6 +82,7 @@ YIXUXI_HOST: 监听地址，默认：0.0.0.0
 YIXUXI_PROXY: 代理设置，格式：protocol://user:pass@ip:port
 YIXUXI_GPT_URL: ChatGPT/ChatGLM API 地址，默认：https://api.openai.com/v1/chat/completions
 YIXUXI_GPT_TOKEN: ChatGPT API Key
+YIXUXI_GPT_MODEL: ChatGPT Model, default: gpt-4o-mini
 YIXUXI_GLM_TOKEN: ChatGLM API Key
 YIXUXI_DEEPL_URL: Deepl API 地址，默认：https://api-free.deepl.com/v2/translate
 YIXUXI_DEEPL_API: Deepl API Key
